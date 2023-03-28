@@ -48,7 +48,7 @@ class AccountCategoryController extends Controller
        
         if($groupedCategories->parent_id!==null)
         {
-            if($groupedCategories->id==35)
+            if($groupedCategories->id==33)
             {
             return "PURCHASE";
            

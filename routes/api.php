@@ -219,6 +219,7 @@ Route::post('updateQuotestatus', [QuotationController::class, 'updateQuotestatus
 Route::post('updateAdvancePay', [AdvancePaymentController::class, 'updateAdvancepay']);
 Route::post('masterstatement', [MasterAccountController::class, 'masterStatement']);
 Route::post('all-account-masterstatement', [MasterAccountController::class, 'allAccountmasterStatement']);
+Route::get('all-account-masterstatement', [MasterAccountController::class, 'allAccountmasterStatement']);
 Route::post('accountSummary', [AdvancePaymentStatementController::class, 'accountSummary']);
 Route::get('paidDivision', [DivisionController::class, 'paidDivision']);
 //  Route::post('all-account-masterstatementvbbbbbbb', [MasterAccountController::class, 'allAccountmasterStatement']);
@@ -237,7 +238,7 @@ Route::get('purchaseTax', [ExpenseController::class,'purchaseTax']);
 Route::get('salesExpenseReport', [AccountCategoryController::class, 'salesExpenseReport']);
 Route::get('profitLoss', [AccountStatementController::class, 'profitLoss']);
 Route::post('InvestmentsDetails', [InvestmentsDetailsController::class, 'store']);
-Route::post('vat', [AccountStatementController::class, 'vat']);
+Route::get('vat', [AccountStatementController::class, 'vat']);
 Route::post('update_company', [QuotationController::class, 'update_company']);
 Route::get('responseData', [AccountStatementController::class, 'responseData']);
 Route::get('accountcategories/{id}', [AccountCategoryController::class, 'accountcategories']);

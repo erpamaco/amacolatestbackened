@@ -606,7 +606,7 @@ class ExpenseController extends Controller
     }
     public function purchaseTax(Expense $expense)
     {
-        $expenses = Expense::where('tax', '!=', ' ')->get();
+        $expenses = Expense::select('expenses.paid_date as issue_date','expenses.*')->where('tax', '!=', ' ')->get();
         // $result=$invoices->party;
         return $expenses;
     }

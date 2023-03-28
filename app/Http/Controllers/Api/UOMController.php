@@ -94,6 +94,12 @@ class UOMController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if(!auth()->check())
+        return ["You are not authorized to access this API."];
+        
+      
+        $uom = UOM::where('id',$id)->delete();
+
+        return response()->json(['msg' => "User is successfully deleted."]);
     }
 }

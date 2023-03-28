@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quotation;
+use App\Models\InvoiceDetail;
 use App\Models\QuotationDetail;
 use App\Models\Division;
 use Illuminate\Http\Request;
@@ -303,6 +304,7 @@ class QuotationController extends Controller
                         'created_at' => $quotation->created_at,
                         'updated_at' => $quotation->updated_at,
                         'status' => $quotation->status,
+                        'quote_type' => $quotation->quote_type,
                         'total_value' => $quotation->total_value,
                         'party_id' => $quotation->party_id,
                         "contact_id" => $quotation->contact_id,
@@ -371,6 +373,7 @@ class QuotationController extends Controller
                 'party_id' => $request['party_id']?$request['party_id']:0,
                 'rfq_id' => $request['rfq_id']?$request['rfq_id']:0,
                 'status' => $request['status'],
+                'quote_type' => $request['quote_type'],
                 'parent_id' => $parentId,
                 'total_value' => isset($request['total_value']) ? $request['total_value'] == "NaN" ? 0 : $request['total_value'] : 0,
                 'net_amount' => $request['net_amount'],
@@ -392,6 +395,7 @@ class QuotationController extends Controller
                 'sign' => $request['sign'],  // ? $request['ps_date'] : Carbon::now()
                 'bank_id' => (int)$request['bank_id'],  // ? $request['ps_date'] : Carbon::now()
                 'subject' => $request['subject']?$request['subject']:null,  // ? $request['ps_date'] : Carbon::now()
+                'subject2' => $request['subject2']?$request['subject2']:null,  // ? $request['ps_date'] : Carbon::now()
                 'rfq_no' => $request['rfq_no']?$request['rfq_no']:null,  // ? $request['ps_date'] : Carbon::now()
                 'transport' => $request['transport']?$request['transport']:null,  // ? $request['ps_date'] : Carbon::now()
                 'other' => $request['other']?$request['other']:null,  // ? $request['ps_date'] : Carbon::now()
@@ -607,6 +611,7 @@ class QuotationController extends Controller
             "currency_type" => $quotation->currency_type,
             "freight_type" => $quotation->freight_type,
             "subject" => $quotation->subject,
+            "subject2" => $quotation->subject2,
             "rfq_no" => $quotation->rfq_no,
             "transport" => $quotation->transport,
             "other" => $quotation->other,
@@ -707,6 +712,7 @@ class QuotationController extends Controller
             "currency_type" => $quotation->currency_type,
             "freight_type" => $quotation->freight_type,
             "subject" => $quotation->subject,
+            "subject2" => $quotation->subject2,
             "rfq_no" => $quotation->rfq_no,
             "transport" => $quotation->transport,
             "other" => $quotation->other,
@@ -811,6 +817,7 @@ class QuotationController extends Controller
             "currency_type" => $quotation->currency_type,
             "freight_type" => $quotation->freight_type,
             "subject" => $quotation->subject,
+            "subject2" => $quotation->subject2,
             "rfq_no" => $quotation->rfq_no,
             "transport" => $quotation->transport,
             "other" => $quotation->other,
@@ -882,6 +889,7 @@ class QuotationController extends Controller
             'delete'=>$quotation->delete,
             "rfq_id" => $quotation->rfq_id || null,
             "status" => $quotation->status,
+            "quote_type" => $quotation->quote_type,
             "total_value" => isset($quotation->total_value)?$quotation->total_value:0,
             "discount_in_p" => isset($quotation->discount_in_p)?$quotation->discount_in_p:0,
             "vat_in_value" => isset($quotation->vat_in_value)? $quotation->vat_in_value:0,
@@ -914,6 +922,7 @@ class QuotationController extends Controller
             "currency_type" => $quotation->currency_type,
             "freight_type" => $quotation->freight_type,
             "subject" => $quotation->subject,
+            "subject2" => $quotation->subject2,
             "rfq_no" => $quotation->rfq_no,
             "transport" => $quotation->transport,
             "other" => $quotation->other,
@@ -1011,6 +1020,7 @@ class QuotationController extends Controller
             'sign' => $request->sign,
             'rfq_no' => $request->rfq_no,
             'subject' => isset($request->subject)?$request->subject:null,
+            'subject2' => isset($request->subject2)?$request->subject2:null,
             'bank_id'=> (int)$request->bank_id,
             'validity' => $request['validity'],
             'payment_terms' => $request['payment_terms'],
@@ -1428,6 +1438,7 @@ class QuotationController extends Controller
                         'div_id' => $quotation->div_id,
                         'is_revised' => $quotation->is_revised,
                         "subject" => isset($quotation->subject)?$quotation->subject:"",
+                        "subject2" => isset($quotation->subject2)?$quotation->subject2:"",
                         'quotation_details' => $quotation->quotationDetail->map(function ($quotation_detail) {
                             $quotation_detail = QuotationDetail::where('id', '=', $quotation_detail->id)->first();
                             return [
@@ -1489,6 +1500,7 @@ class QuotationController extends Controller
                         'div_id' => $quotation->div_id,
                         'is_revised' => $quotation->is_revised,
                         "subject" => isset($quotation->subject)?$quotation->subject:"",
+                        "subject2" => isset($quotation->subject2)?$quotation->subject2:"",
                         'quotation_details' => $quotation->quotationDetail->map(function ($quotation_detail) {
                             $quotation_detail = QuotationDetail::where('id', '=', $quotation_detail->id)->first();
                             return [
@@ -1550,6 +1562,7 @@ class QuotationController extends Controller
                         'discount_in_p' => $quotation['discount_in_p'],
                         'div_id' => $quotation->div_id,
                         'subject' => $quotation->subject,
+                        'subject2' => $quotation->subject2,
                         'quotation_details' => $quotation->quotationDetail->map(function ($quotation_detail) {
                             $quotation_detail = QuotationDetail::where('id', '=', $quotation_detail->id)->first();
                             // $isDelivered = $this->checkDeliveredProductQuantity($quotation_detail);
@@ -1613,6 +1626,7 @@ class QuotationController extends Controller
                         "transaction_type" => $quotation->transaction_type,
                         'discount_in_p' => $quotation['discount_in_p'],
                         'subject' => $quotation['subject'],
+                        'subject2' => $quotation['subject2'],
                         'quotation_details' => $quotation->quotationDetail->map(function ($quotation_detail) {
                             $quotation_detail = QuotationDetail::where('id', '=', $quotation_detail->id)->first();
                             return [
@@ -1663,7 +1677,7 @@ class QuotationController extends Controller
         if(!auth()->check())
         return ["You are not authorized to access this API."];
         
-        $reports = Quotation::where('transaction_type','sale')->where('delete',0)
+        $reports = Invoice::where('delete_status',0)
         ->whereBetween('created_at', [$request->from_date . ' ' . '00:00:00', $request->to_date ? $request->to_date . ' ' . '23:59:59' : now()])->get();
 
         if($reports){
@@ -1672,35 +1686,38 @@ class QuotationController extends Controller
                     $data = [
                         'id' => $quotation->id,
                         'po_number' => $quotation->po_number,
-                        'created_at' => $quotation->created_at,
-                        'updated_at' => $quotation->updated_at,
-                        'status' => $quotation->status,
+                        'issue_date' => $quotation->issue_date,
+                        'contact_id' => $quotation->contact_id,
+                        // 'status' => $request->status,
+                        // 'quotation_id' => $request->quotation_id,
                         'total_value' => $quotation->total_value,
+                        'bank_id' => $quotation->bank_id,
+                        'exclude_from_vat' => $quotation->exclude_from_vat,
+                        'discount_in_percentage' => $quotation->discount_in_percentage,
+                        'vat_in_value' => $quotation->vat_in_value,
+                        'grand_total' => $quotation->grand_total,
+                        'proforma' => $quotation->proforma,
+                        'delivery_no' => null,
                         'party_id' => $quotation->party_id,
-                        "contact_id" => $quotation->contact_id,
-                        "contact" => $quotation->contact,
                         "party" => $quotation->party,
-                        "vat_in_value" => $quotation->vat_in_value,
-                        "net_amount" => $quotation->net_amount,
-                        "transaction_type" => $quotation->transaction_type,
-                        'discount_in_p' => $quotation->discount_in_p,
-                        'ps_date' => $quotation->ps_date,
-                        'quotation_details' => $quotation->quotationDetail->map(function ($quotation_detail) {
-                            $quotation_detail = QuotationDetail::where('id', '=', $quotation_detail->id)->first();
+                        'div_id' => $quotation->div_id,  // ? $request->ps_date : Carbon::now()
+                        'user_id' => $quotation->user_id,
+                        // 'contact_id' => $request->contact_id
+                        'invoice_details' => $quotation->invoiceDetail->map(function ($quotation_detail) {
+                            $quotation_detail = InvoiceDetail::where('id', '=', $quotation_detail->id)->first();
                             return [
                                 "id" => $quotation_detail['id'],
-                                "created_at" => $quotation_detail->created_at,
-                                "updated_at" => $quotation_detail->updated_at,
-                                "product_id" => $quotation_detail->product_id,
-                                "product" => array($quotation_detail->product),
-                                "description" => $quotation_detail->description,
-                                "quantity" => $quotation_detail->quantity,
-                                "total_amount" => $quotation_detail->total_amount,
-                                "analyse_id" => $quotation_detail->analyse_id,
-                                "purchase_price" => $quotation_detail->purchase_price,
-                                "margin" => $quotation_detail->margin,
-                                "sell_price" => $quotation_detail->sell_price,
-                                "remark" => $quotation_detail->remark,
+                                'product_id' => $quotation_detail->product_id,
+                                'sell_price' => $quotation_detail->sell_price,
+                                'quantity' => $quotation_detail->quantity,
+                                'total_amount' => $quotation_detail->total_amount,
+                                'unit_of_measure' => $quotation_detail->unit_of_measure,
+                                'margin' => $quotation_detail->margin,
+                                'description' => $quotation_detail->description,
+                                'arabic_description' => $quotation_detail->arabic_description,
+                                // 'invoice_id' => $_invoice_id,
+                                'purchase_price' => $quotation_detail->purchase_price,
+            
                             ];
                         }),
                     ];
@@ -1944,6 +1961,7 @@ public function show_quotation($id)
             "currency_type" => $quotation->currency_type,
             "freight_type" => $quotation->freight_type,
             "subject" => $quotation->subject,
+            "subject2" => $quotation->subject2,
             "rfq_no" => $quotation->rfq_no,
             "transport" => $quotation->transport,
             "other" => $quotation->other,
@@ -2057,6 +2075,7 @@ public function show_quotation($id)
                     'discount_in_p' => $quotation['discount_in_p'],
                     'div_id' => $quotation->div_id,
                     'subject' => $quotation->subject,
+                    'subject2' => $quotation->subject2,
                     'quotation_details' => $quotation->quotationDetail->map(function ($quotation_detail) {
                         $quotation_detail = QuotationDetail::where('id', '=', $quotation_detail->id)->first();
                         // $isDelivered = $this->checkDeliveredProductQuantity($quotation_detail);

@@ -112,12 +112,12 @@ class MasterAccountController extends Controller
         return ["You are not authorized to access this API."];
         
         $invoiceCollection = new Collection();
-        $total_div=Paymentaccount::where('type','division')->sum('balance');
+        $total_div=Paymentaccount::select('payment_accounts.created_at as issue_date','payment_accounts.*')->where('type','division')->sum('balance');
         // $total_div=Division::sum('opening_bal');
         if($request->from_date){
-            $invoiceCollection = Expense::join('payment_accounts','expenses.utilize_div_id','payment_accounts.id')->join('account_categories','account_categories.id','expenses.account_category_id')->where('status','verified')->where('payment_accounts.type','division')->select('payment_accounts.name as div_name','payment_accounts.name as nick_name','account_categories.name as cat_name','expenses.utilize_div_id as divid','expenses.utilize_div_id as expense_type','expenses.*')->whereBetween('expenses.created_at', [$request->from_date . ' ' . '00:00:00', $request->to_date ? $request->to_date . ' ' . '23:59:59' : now()])->get();
+            $invoiceCollection = Expense::join('payment_accounts','expenses.utilize_div_id','payment_accounts.id')->join('account_categories','account_categories.id','expenses.account_category_id')->where('status','verified')->where('payment_accounts.type','division')->select('payment_accounts.name as div_name','payment_accounts.name as nick_name','account_categories.name as cat_name','expenses.utilize_div_id as divid','expenses.paid_date as issue_date','expenses.utilize_div_id as expense_type','expenses.*')->whereBetween('expenses.created_at', [$request->from_date . ' ' . '00:00:00', $request->to_date ? $request->to_date . ' ' . '23:59:59' : now()])->get();
 
-            $divEopenbalance=Expense::where('status','verified')->whereDate('created_at','<=' ,date('Y-m-d H:i:s', strtotime($request->from_date)))->sum('amount');
+            $divEopenbalance=Expense::where('status','verified')->whereDate('paid_date','<=' ,date('Y-m-d H:i:s', strtotime($request->from_date)))->sum('amount');
         }else{
             $invoiceCollection = Expense::all();
            
@@ -125,15 +125,15 @@ class MasterAccountController extends Controller
 
         $receiptCollection = new Collection();
         if($request->from_date){
-            $receiptCollection = Receipt::join('payment_accounts','receipts.div_id','payment_accounts.id')->join('parties','parties.id','receipts.party_id')->select('payment_accounts.name as div_name','receipts.*','parties.firm_name as paid_to','payment_accounts.name as receipt_type')->whereBetween('receipts.created_at', [$request->from_date . ' ' . '00:00:00', $request->to_date ? $request->to_date. ' ' . '23:59:59' : now()])->get();
-            $divRopenbalance=Receipt::whereDate('created_at','<=' ,date('Y-m-d H:i:s', strtotime($request->from_date)))->sum('paid_amount');
+            $receiptCollection = Receipt::join('payment_accounts','receipts.div_id','payment_accounts.id')->join('parties','parties.id','receipts.party_id')->select('payment_accounts.name as div_name','receipts.paid_date as issue_date','receipts.*','parties.firm_name as paid_to','payment_accounts.name as receipt_type')->get();
+            $divRopenbalance=Receipt::whereDate('paid_date','<=' ,date('Y-m-d H:i:s', strtotime($request->from_date)))->sum('paid_amount');
         }else{
             $receiptCollection = Receipt::all();
            
 
         }
         $advanceCollection = new Collection();
-        $advance=AdvancePayment::whereBetween('advance_payments.created_at', [$request->from_date . ' ' . '00:00:00', $request->to_date ? $request->to_date. ' ' . '23:59:59' : now()])->get();
+        $advance=AdvancePayment::select('advance_payments.created_at as issue_date','advance_payments.*')->get();
         $advanceData=$advance->filter(function($obj){
             if($obj->paymentAccount->type=="division" && $obj->receivedBy->type=="personal")
                 {

@@ -652,16 +652,20 @@ class InvoiceController extends Controller
                 'invoice_no' => $this->genInvoiceNo($request->ps_date, $div)
             ]);
         }
-        $quotation = Quotation::where("id", $request->qtid)->firstOrFail();
-        $filePath = null;
-        if ($request->file('file')) {
-            $filePath = $request->file('file')->move("quotate/filePath",  $request->file('file')->getClientOriginalName());
-        }
-        $quotation->update([
+        // if($request->qtid){
+        //     $quotation = Quotation::where("id", $request->qtid)->firstOrFail();
+        // $filePath = null;
+        // if ($request->file('file')) {
+        //     $filePath = $request->file('file')->move("quotate/filePath",  $request->file('file')->getClientOriginalName());
+        // }
+        // $quotation->update([
             
-            'file' => $filePath,
+        //     'file' => $filePath,
             
-        ]);
+        // ]);
+            
+        // }
+        
 
         $invoice->update([
             // 'invoice_no' => $request->invoice_no,
