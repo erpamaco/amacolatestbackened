@@ -64,8 +64,8 @@ class StackController extends Controller
             'invoice' => InvoiceController::index(),
             'salesList' => $d-> original,
             'acceptedList' => $q-> original,
-            'rec' => Receipt::get(),
-            'expense' => Expense::get(),
+            'rec' => Receipt::select('receipts.paid_date as issue_date','receipts.*')->get(),
+            'expense' => Expense::select('expenses.paid_date as issue_date','expenses.*')->get(),
             'po' => Quotation::where('transaction_type','purchase')->get(),
             
         ]);
